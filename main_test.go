@@ -7,14 +7,23 @@ import (
 
 func TestCheckVisibility(t *testing.T) {
 	t1 := Triangle{
-		p1: Point{2.0, 3.6, 4.2},
-		p2: Point{1.4, 0.9, 5.3},
-		p3: Point{4.8, 8.4, 6.4},
+		p1: Point{1, 0, 0},
+		p2: Point{0, 1, 0},
+		p3: Point{0, 0, 1},
 	}
 
-	p := Point{9.6, 16.8, 12.8}
+	tp1 := Point{1.0 / 3, 1.0 / 3, 1.0 / 3}
+	assert.Equal(t, true, isVisible(tp1, t1))
 
-	assert.Equal(t, false, isVisible(p, t1))
+	tp2 := Point{0.5, 0.5, 0.5}
+	assert.Equal(t, false, isVisible(tp2, t1))
+
+	tp3 := Point{1, 1, 1}
+	assert.Equal(t, false, isVisible(tp3, t1))
+
+	tp4 := Point{-1, -1, -1}
+	assert.Equal(t, true, isVisible(tp4, t1))
+
 }
 
 func TestDet(t *testing.T) {

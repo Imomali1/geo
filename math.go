@@ -4,21 +4,27 @@ type Matrix [][]float64
 type stack []float64
 
 func ParallelTriangle(p Point, t Triangle) Triangle {
-	var t1 Triangle
+	var newT Triangle
 
-	a := (t.p2.y-t.p1.y)*(t.p3.z-t.p1.z) - (t.p3.y-t.p1.y)*(t.p2.z-t.p1.z)
-	b := (t.p3.x-t.p1.z)*(t.p2.z-t.p1.z) - (t.p2.x-t.p1.x)*(t.p3.z-t.p1.z)
-	c := (t.p2.x-t.p1.x)*(t.p3.y-t.p1.y) - (t.p3.x-t.p1.x)*(t.p2.y-t.p1.y)
+	x1, y1, z1 := t.p1.x, t.p1.y, t.p1.z
+	x2, y2, z2 := t.p2.x, t.p2.y, t.p2.z
+	x3, y3, z3 := t.p3.x, t.p3.y, t.p3.z
+
+	a := (y2-y1)*(z3-z1) - (y3-y1)*(z2-z1)
+	b := (x3-z1)*(z2-z1) - (x2-x1)*(z3-z1)
+	c := (x2-x1)*(y3-y1) - (x3-x1)*(y2-y1)
 	d := -a*p.x - b*p.y - c*p.z
 
-	k1 := (-d) / (a*t.p1.x + b*t.p1.y + c*t.p1.z)
-	t1.p1.x, t1.p1.y, t1.p1.z = k1*t.p1.x, k1*t.p1.y, k1*t.p1.z
-	k2 := (-d) / (a*t.p2.x + b*t.p2.y + c*t.p2.z)
-	t1.p2.x, t1.p2.y, t1.p2.z = k2*t.p2.x, k2*t.p2.y, k2*t.p2.z
-	k3 := (-d) / (a*t.p3.x + b*t.p3.y + c*t.p3.z)
-	t1.p3.x, t1.p3.y, t1.p3.z = k3*t.p3.x, k3*t.p3.y, k3*t.p3.z
+	k := (-d) / (a*x1 + b*y1 + c*z1)
+	newT.p1.x, newT.p1.y, newT.p1.z = k*x1, k*y1, k*z1
 
-	return t1
+	k = (-d) / (a*x2 + b*y2 + c*z2)
+	newT.p2.x, newT.p2.y, newT.p2.z = k*x2, k*y2, k*z2
+
+	k = (-d) / (a*x3 + b*y3 + c*z3)
+	newT.p3.x, newT.p3.y, newT.p3.z = k*x3, k*y3, k*z3
+
+	return newT
 }
 
 func det(p1, p2, p3, p4 Point) float64 {

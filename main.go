@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type Point struct {
 	x, y, z float64
 }
@@ -9,46 +11,91 @@ type Triangle struct {
 }
 
 func main() {
-	defer writer.Flush()
-
 	// given triangle
 	var t Triangle
 	// given point to check
 	var p Point
 
-	scanf("%f %f %f\n", &t.p1.x, &t.p1.y, &t.p1.z)
-	scanf("%f %f %f\n", &t.p2.x, &t.p2.y, &t.p2.z)
-	scanf("%f %f %f\n", &t.p3.x, &t.p3.y, &t.p3.z)
-	scanf("%f %f %f\n", &p.x, &p.y, &p.z)
+	p, t = input()
 
 	if isVisible(p, t) {
-		printf("%s\n", "Point is seen")
+		fmt.Println("Point is seen")
 	} else {
-		printf("%s\n", "Point is not seen")
+		fmt.Println("Point is not seen")
 	}
 }
 
-func isVisible(p Point, t Triangle) (visible bool) {
-	tx := ParallelTriangle(p, t)
+func isVisible(p Point, t Triangle) bool {
+	// Unless at least one point of triangle lies
+	// in the same octant with given test point, the point can be seen
+	if !isSameOctant(p, t) {
+		return true
+	}
+
 	// Observer's coordinates
-	var p0 = Point{
-		x: 0,
-		y: 0,
-		z: 0,
+	var p0 = Point{x: 0, y: 0, z: 0}
+
+	// If the point is inside the tetrahedron
+	// which has vertices p0 and given triangle coords, the point can be seen
+	whichTetra := 1
+	if isPointInsideOfTetrahedron(p, p0, t, whichTetra) {
+		return true
 	}
 
-	d0 := det(tx.p1, tx.p2, tx.p3, p0)
-	d1 := det(p, tx.p2, tx.p3, p0)
-	d2 := det(tx.p1, p, tx.p3, p0)
-	d3 := det(tx.p1, tx.p2, p, p0)
-	d4 := det(tx.p1, tx.p2, tx.p3, p)
+	// The triangle on the same plane with the test point
+	tx := ParallelTriangle(p, t)
 
-	if (d1 == 0 || d2 == 0 || d3 == 0 || d4 == 0) ||
-		(d0*d1 < 0 || d0*d2 < 0 || d0*d3 < 0 || d0*d4 < 0) {
-		visible = false
-	} else {
-		visible = true
+	// If the point is inside the tetrahedron
+	// which has vertices p0 and found triangle coords(which are on a same plane with the test point),
+	// the point cannot be seen
+	whichTetra = 2
+	if isPointInsideOfTetrahedron(p, p0, tx, whichTetra) {
+		return false
 	}
+
+	// In other cases, the point can be seen
+	return true
+}
+
+func isPointInsideOfTetrahedron(p, p0 Point, t Triangle, whichTetra int) bool {
+	d0 := det(t.p1, t.p2, t.p3, p0)
+	d1 := det(p, t.p2, t.p3, p0)
+	d2 := det(t.p1, p, t.p3, p0)
+	d3 := det(t.p1, t.p2, p, p0)
+	d4 := det(t.p1, t.p2, t.p3, p)
+
+	// If the point lies on the given triangle,
+	// it cannot be seen
+	if whichTetra == 1 && d4 == 0 {
+		return false
+	}
+
+	if d0*d1 < 0 || d0*d2 < 0 || d0*d3 < 0 || d0*d4 < 0 {
+		return false
+	}
+	return true
+}
+
+func isSameOctant(p Point, t Triangle) bool {
+	if (t.p1.x*p.x >= 0 && t.p1.y*p.y >= 0 && t.p1.z*p.z >= 0) ||
+		(t.p2.x*p.x >= 0 && t.p2.y*p.y >= 0 && t.p2.z*p.z >= 0) ||
+		(t.p3.x*p.x >= 0 && t.p3.y*p.y >= 0 && t.p3.z*p.z >= 0) {
+		return true
+	}
+	return false
+}
+
+func input() (p Point, t Triangle) {
+	fmt.Println("Enter coordinates of triangle:")
+	fmt.Print("x1 y1 z1 => ")
+	scanf("%f %f %f\n", &t.p1.x, &t.p1.y, &t.p1.z)
+	fmt.Print("x2 y2 z2 => ")
+	scanf("%f %f %f\n", &t.p2.x, &t.p2.y, &t.p2.z)
+	fmt.Print("x3 y3 z3 => ")
+	scanf("%f %f %f\n", &t.p3.x, &t.p3.y, &t.p3.z)
+	fmt.Println("Enter coordinates of test point")
+	fmt.Print("x y z => ")
+	scanf("%f %f %f\n", &p.x, &p.y, &p.z)
 
 	return
 }
