@@ -4,17 +4,16 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"runtime"
 )
 
-var (
-	reader = bufio.NewReader(os.Stdin)
-	writer = bufio.NewWriter(os.Stdout)
-)
+var reader = bufio.NewReader(os.Stdin)
 
-func scanf(template string, args ...interface{}) {
-	fmt.Fscanf(reader, template, args...)
+func scanf(template string, args ...interface{}) (err error) {
+	_, err = fmt.Fscanf(reader, template, args...)
+	return
 }
 
-func printf(template string, args ...interface{}) {
-	fmt.Fprintf(writer, template, args...)
+func info() {
+	fmt.Printf("App is running on %s/%s\n\n", runtime.GOOS, runtime.GOARCH)
 }
